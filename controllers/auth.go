@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -19,6 +18,8 @@ type signinReq struct {
 }
 
 func Signup(c *fiber.Ctx) error {
+
+	JWTKEY := os.Getenv("JWTKEY")
 
 	newUser := new(models.User)
 
@@ -52,6 +53,28 @@ func Signup(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": signupErr.Error()})
 	}
 
+	tokenClaims := jwt.MapClaims{
+		"id":  newUser.UserID,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenClaims)
+
+	tokenString, tokenErr := token.SignedString([]byte(JWTKEY))
+
+	if tokenErr != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to login"})
+	}
+
+	cookie := new(fiber.Cookie)
+
+	cookie.Name = "access_id"
+	cookie.Value = tokenString
+	cookie.HTTPOnly = true
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+
+	c.Cookie(cookie)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Account Created"})
 }
 
@@ -73,8 +96,6 @@ func Signin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Please fill the required fields"})
 	}
 
-	fmt.Println(userCreds.UserID)
-
 	thisUser := db_helpers.GetUserByUserID(userCreds.UserID)
 
 	if thisUser.Err() != nil {
@@ -93,14 +114,14 @@ func Signin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Credentials"})
 	}
 
-	sessionTokenClaims := jwt.MapClaims{
+	tokenClaims := jwt.MapClaims{
 		"id":  user.UserID,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	}
 
-	sessionToken := jwt.NewWithClaims(jwt.SigningMethodHS256, sessionTokenClaims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenClaims)
 
-	sessionTokenString, tokenErr := sessionToken.SignedString([]byte(JWTKEY))
+	tokenString, tokenErr := token.SignedString([]byte(JWTKEY))
 
 	if tokenErr != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to login"})
@@ -109,7 +130,7 @@ func Signin(c *fiber.Ctx) error {
 	cookie := new(fiber.Cookie)
 
 	cookie.Name = "access_id"
-	cookie.Value = sessionTokenString
+	cookie.Value = tokenString
 	cookie.HTTPOnly = true
 	cookie.Expires = time.Now().Add(24 * time.Hour)
 
@@ -117,4 +138,18 @@ func Signin(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusOK)
 
+}
+
+func Logout(c *fiber.Ctx) error {
+
+	cookie := new(fiber.Cookie)
+
+	cookie.Name = "access_id"
+	cookie.Value = ""
+	cookie.HTTPOnly = true
+	cookie.Expires = time.Now().Add(3 * time.Second)
+
+	c.Cookie(cookie)
+
+	return c.SendStatus(200)
 }

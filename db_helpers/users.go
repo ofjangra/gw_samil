@@ -3,7 +3,6 @@ package db_helpers
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
@@ -55,8 +54,6 @@ func GetUserByUserID(id string) *mongo.SingleResult {
 	defer cancel()
 
 	result := db.UsersCollection.FindOne(ctx, bson.M{"userid": id})
-
-	fmt.Println(result)
 
 	return result
 }
