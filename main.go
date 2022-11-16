@@ -23,7 +23,7 @@ func main() {
 
 	app.Static("/", "./dist")
 
-	routes.Router(app)
+	routes.Router_Samil(app)
 
 	indexPath, pathErr := filepath.Abs("./dist/index.html")
 

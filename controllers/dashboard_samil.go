@@ -8,13 +8,13 @@ import (
 	"github.com/ofjangra/gwonline/models"
 )
 
-func Home(c *fiber.Ctx) error {
-	user := new(models.User)
-	userID := c.Locals("user_id").(string)
+func Home_Samil(c *fiber.Ctx) error {
+	user := new(models.SamilEmployee)
+	userEmail := c.Locals("user_email").(string)
 
-	fmt.Println(userID)
+	fmt.Println(userEmail)
 
-	decodeErr := db_helpers.GetUserByUserID(userID).Decode(&user)
+	decodeErr := db_helpers.GetSamilEmployeeByEmail(userEmail).Decode(&user)
 
 	if decodeErr != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Something went wrong"})

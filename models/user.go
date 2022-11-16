@@ -2,11 +2,15 @@ package models
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
-type User struct {
-	ID       primitive.ObjectID `json:"_id" bson:"_id"`
-	UserID   string             `json:"userid"`
-	Location string             `json:"location"`
-	UserLink string             `json:"userlink"`
-	Password string             `json:"password"`
-	Active   bool               `json:"active"` // active || non-active
+type FleetUser struct {
+	ID        primitive.ObjectID `json:"_id" bson:"_id"`
+	Firstname string             `json:"firstname"`
+	Lastname  string             `json:"lastname"`
+	Email     string             `json:"email"`
+	Phone     string             `json:"phone"`
+	DOB       string             `json:"DOB"`
+	Gender    string             `json:"gender"`
+	Activated bool               `json:"activated"`
+	Location  string             `json:"location"`
+	Address   string             `json:"address"`
 }

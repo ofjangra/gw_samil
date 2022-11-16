@@ -7,16 +7,17 @@ import (
 	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func dbInstance() *mongo.Client {
-	// envLoadErr := godotenv.Load(".env")
+	envLoadErr := godotenv.Load(".env")
 
-	// if envLoadErr != nil {
-	// 	log.Fatal("Failed to load environment variables")
-	// }
+	if envLoadErr != nil {
+		log.Fatal("Failed to load environment variables")
+	}
 
 	var DBURI string = os.Getenv("DBURI")
 

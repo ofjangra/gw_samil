@@ -28,7 +28,7 @@ func Authrequired() fiber.Handler {
 
 		payload := token.Claims.(jwt.MapClaims)
 
-		c.Locals("user_id", payload["id"])
+		c.Locals("user_email", payload["email"])
 
 		return c.Next()
 	}
