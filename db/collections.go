@@ -2,9 +2,13 @@ package db
 
 import "go.mongodb.org/mongo-driver/mongo"
 
-var Employee_samilCollection *mongo.Collection
+var SamilUsersCollection *mongo.Collection
 
 var EmployeesCollection *mongo.Collection
+
+var VehiclesCollection *mongo.Collection
+
+var FleetUsersCollection *mongo.Collection
 
 func init() {
 
@@ -12,6 +16,10 @@ func init() {
 
 	EmployeesCollection = client.Database("main").Collection("employees")
 
-	Employee_samilCollection = client.Database("samil_users").Collection("users")
+	SamilUsersCollection = client.Database("users").Collection("samil_users")
+
+	FleetUsersCollection = client.Database("users").Collection("fleet_users")
+
+	VehiclesCollection = client.Database("vehicles").Collection("fleet_vehicles")
 
 }

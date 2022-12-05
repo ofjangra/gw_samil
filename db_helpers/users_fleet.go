@@ -14,62 +14,62 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func InsertEmployee(employee *models.Employee) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+func CreateFleetUser(user *models.FleetUser) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
 	defer cancel()
 
-	docCountWithThisEmail, docCountWithEmailErr := db.EmployeesCollection.CountDocuments(ctx, bson.M{"email": employee.Email})
+	docCountWithThisEmail, docCountWithEmailErr := db.FleetUsersCollection.CountDocuments(ctx, bson.M{"email": user.Email})
 
 	if docCountWithEmailErr != nil {
-		return errors.New("failed to create employee e1")
+		return errors.New("failed to create account")
 	}
 
 	if docCountWithThisEmail > 0 {
 		return errors.New("email already in use")
 	}
 
-	docCountWithThisPhone, docCountWithThisPhoneErr := db.EmployeesCollection.CountDocuments(ctx, bson.M{"contact": employee.Contact})
+	docCountWithThisPhone, docCountWithThisPhoneErr := db.FleetUsersCollection.CountDocuments(ctx, bson.M{"contact": user.Phone})
 
 	if docCountWithThisPhoneErr != nil {
-		return errors.New("failed to create employee p1")
+		return errors.New("failed to create account")
 	}
 
 	if docCountWithThisPhone > 0 {
 		return errors.New("phone number already in use")
 	}
 
-	_, insertError := db.EmployeesCollection.InsertOne(ctx, employee)
+	_, insertError := db.FleetUsersCollection.InsertOne(ctx, user)
 
 	if insertError != nil {
-		return errors.New("failed to create employee d1")
+		return errors.New("failed to create account")
 	}
 
 	return nil
 }
 
-func GetEmployeeByEmail(email string) *mongo.SingleResult {
+func GetFleetUserByPhone(phone string) *mongo.SingleResult {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 
 	defer cancel()
 
-	result := db.EmployeesCollection.FindOne(ctx, bson.M{"email": email})
+	result := db.FleetUsersCollection.FindOne(ctx, bson.M{"phone": phone})
 
 	return result
 }
 
-func GetEmployeeById(id string) (*mongo.SingleResult, error) {
+func GetFleetUserById(id string) (*mongo.SingleResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 
 	defer cancel()
 
-	employeeId, idErr := primitive.ObjectIDFromHex(id)
+	userId, idErr := primitive.ObjectIDFromHex(id)
 
 	if idErr != nil {
 		return nil, idErr
 	}
 
-	result := db.EmployeesCollection.FindOne(ctx, bson.M{"_id": employeeId},
+	result := db.FleetUsersCollection.FindOne(ctx, bson.M{"_id": userId},
 		options.FindOne().SetProjection(bson.M{
 			"password": 0}))
 
@@ -80,49 +80,49 @@ func GetEmployeeById(id string) (*mongo.SingleResult, error) {
 	return result, nil
 }
 
-func GetAllEmployees() ([]primitive.M, error) {
+func GetAllFleetUsers() ([]primitive.M, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 
 	defer cancel()
 
-	employees := []primitive.M{}
+	users := []primitive.M{}
 
-	cur, curErr := db.EmployeesCollection.Find(ctx, bson.M{}, options.Find().SetSort(bson.M{"created_on": -1}))
+	cur, curErr := db.FleetUsersCollection.Find(ctx, bson.M{}, options.Find().SetSort(bson.M{"created_on": -1}))
 
 	if curErr != nil {
-		return nil, errors.New("failed to fetch employees")
+		return nil, errors.New("failed to fetch users")
 	}
 
 	for cur.Next(context.Background()) {
-		employee := bson.M{}
+		user := bson.M{}
 
-		err := cur.Decode(&employee)
+		err := cur.Decode(&user)
 
 		if err != nil {
-			return nil, errors.New("failed to fetch employees")
+			return nil, errors.New("failed to fetch users")
 		}
 
-		employees = append(employees, employee)
+		users = append(users, user)
 	}
 
 	defer cur.Close(context.Background())
 
-	return employees, nil
+	return users, nil
 
 }
 
-func UpdateEmployeeProfile(id string, update bson.M) error {
+func UpdateFleetUserProfile(id string, update bson.M) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 
 	defer cancel()
 	fmt.Println(id)
-	employeeId, idErr := primitive.ObjectIDFromHex(id)
+	userId, idErr := primitive.ObjectIDFromHex(id)
 
 	if idErr != nil {
 		return errors.New("failed to update profile 1")
 	}
 
-	_, updateErr := db.EmployeesCollection.UpdateByID(ctx, employeeId, bson.M{"$set": update})
+	_, updateErr := db.FleetUsersCollection.UpdateByID(ctx, userId, bson.M{"$set": update})
 
 	if updateErr != nil {
 		fmt.Println(updateErr)
@@ -132,18 +132,18 @@ func UpdateEmployeeProfile(id string, update bson.M) error {
 
 }
 
-func DeleteEmployee(id string) error {
+func DeleteFleetUser(id string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 
 	defer cancel()
 	fmt.Println(id)
-	employeeId, idErr := primitive.ObjectIDFromHex(id)
+	userId, idErr := primitive.ObjectIDFromHex(id)
 
 	if idErr != nil {
 		return errors.New("failed to update profile 1")
 	}
 
-	_, deleteErr := db.EmployeesCollection.DeleteOne(ctx, bson.M{"_id": employeeId})
+	_, deleteErr := db.FleetUsersCollection.DeleteOne(ctx, bson.M{"_id": userId})
 
 	if deleteErr != nil {
 		fmt.Println(deleteErr)

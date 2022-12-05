@@ -1,4 +1,4 @@
-package controllers
+package samil_controllers
 
 import (
 	"fmt"
@@ -9,12 +9,12 @@ import (
 )
 
 func Home_Samil(c *fiber.Ctx) error {
-	user := new(models.SamilEmployee)
-	userEmail := c.Locals("user_email").(string)
+	user := new(models.SamilUser)
+	userID := c.Locals("user_id").(string)
 
-	fmt.Println(userEmail)
+	fmt.Println(userID)
 
-	decodeErr := db_helpers.GetSamilEmployeeByEmail(userEmail).Decode(&user)
+	decodeErr := db_helpers.GetSamilUserById(userID).Decode(&user)
 
 	if decodeErr != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Something went wrong"})

@@ -7,18 +7,13 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-type ReqHeader struct {
-	Authorization string
-}
-
-func Authrequired() fiber.Handler {
+func AdminAuth() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-
-		if c.Cookies("access_id_sml") == "" {
+		if c.Cookies("aid_gad") == "" {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "You are not authorized"})
 		}
 
-		token, err := jwt.Parse(c.Cookies("access_id_sml"), func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(c.Cookies("aid_gad"), func(token *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("JWTKEY")), nil
 		})
 
@@ -28,8 +23,7 @@ func Authrequired() fiber.Handler {
 
 		payload := token.Claims.(jwt.MapClaims)
 
-		c.Locals("user_id", payload["id"])
-
+		c.Locals("employee_id", payload["id"])
 		return c.Next()
 	}
 }

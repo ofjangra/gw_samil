@@ -1,14 +1,16 @@
-package controllers
+package admin_controllers
 
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 	"github.com/ofjangra/gwonline/db_helpers"
 	"github.com/ofjangra/gwonline/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -20,7 +22,7 @@ func Signup_employee(c *fiber.Ctx) error {
 	bodyParseErr := c.BodyParser(&newEmployee)
 
 	if bodyParseErr != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create employee"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to parse body", "err": bodyParseErr.Error()})
 	}
 
 	fmt.Println(newEmployee)
@@ -43,9 +45,19 @@ func Signup_employee(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Something went wrong"})
 	}
 
+	newEmployee.Email = strings.ToLower(newEmployee.Email)
+
 	newEmployee.Password = string(passwordHash)
 
 	newEmployee.ID = primitive.NewObjectID()
+
+	newEmployee.CreatedOn = primitive.NewDateTimeFromTime(time.Now())
+
+	newEmployee.UpdatedOn = primitive.NewDateTimeFromTime(time.Now())
+
+	newEmployee.CreatedBy = c.Locals("employee_id").(string)
+
+	newEmployee.UpdatedBy = c.Locals("employee_id").(string)
 
 	employeeInsertionErr := db_helpers.InsertEmployee(newEmployee)
 
@@ -98,8 +110,8 @@ func Signin_employee(c *fiber.Ctx) error {
 	}
 
 	tokenClaims := jwt.MapClaims{
-		"email": employee.Email,
-		"exp":   time.Now().Add(time.Minute * 45).Unix(),
+		"id":  employee.ID,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenClaims)
@@ -112,13 +124,84 @@ func Signin_employee(c *fiber.Ctx) error {
 
 	cookie := new(fiber.Cookie)
 
-	cookie.Name = "access_id"
+	cookie.Name = "aid_gad"
 	cookie.Value = tokenString
 	cookie.HTTPOnly = true
-	cookie.Expires = time.Now().Add(45 * time.Minute)
+	cookie.Expires = time.Now().Add(24 * time.Hour)
 
 	c.Cookie(cookie)
 
 	return c.SendStatus(fiber.StatusOK)
+
+}
+
+func CreateSuperAdmin(c *fiber.Ctx) error {
+
+	updater := new(models.Employee)
+
+	employee := new(models.Employee)
+
+	updaterId := c.Locals("employee_id").(string)
+
+	thisUpdater, findingErr := db_helpers.GetEmployeeById(updaterId)
+
+	if findingErr != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request Failed"})
+	}
+
+	updaterDecodeErr := thisUpdater.Decode(&updater)
+
+	if updaterDecodeErr != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request Failed"})
+	}
+
+	if updater.EmployeeType != "Super Admin" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request Denied"})
+	}
+
+	empId := c.Params("id")
+
+	thisEmployee, thisEmpErr := db_helpers.GetEmployeeById(empId)
+
+	if thisEmpErr != nil {
+		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Request Failed"})
+	}
+
+	employeeDecodeErr := thisEmployee.Decode(&employee)
+
+	if employeeDecodeErr != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request Failed"})
+	}
+
+	if employee.EmployeeType == "Super Admin" {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Already a super admin"})
+	}
+
+	allowedOps := map[string]bool{"view": true, "add": true, "edit": true, "delete": true}
+
+	privillages := map[string]map[string]bool{
+		"dashboard":            allowedOps,
+		"customer_master":      allowedOps,
+		"employee_master":      allowedOps,
+		"user_master":          allowedOps,
+		"vehicle_master":       allowedOps,
+		"admin_master":         allowedOps,
+		"bulk_data_master":     allowedOps,
+		"other_options_master": allowedOps,
+	}
+
+	updateBody := bson.M{"privillages": privillages, "employee_type": "Super Admin"}
+
+	updateBody["updated_by"] = updaterId
+
+	updateBody["updated_on"] = primitive.NewDateTimeFromTime(time.Now())
+
+	updateErr := db_helpers.UpdateEmployeeProfile(empId, updateBody)
+
+	if updateErr != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Could not fulfill the request"})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "New super admin added"})
 
 }

@@ -1,4 +1,4 @@
-package controllers
+package samil_controllers
 
 import (
 	"os"
@@ -14,43 +14,43 @@ import (
 
 func Signup_samil(c *fiber.Ctx) error {
 
-	newEmployee := new(models.SamilEmployee)
+	newUser := new(models.SamilUser)
 
-	bodyParseErr := c.BodyParser(&newEmployee)
+	bodyParseErr := c.BodyParser(&newUser)
 
 	if bodyParseErr != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Something went wrong"})
 	}
 
-	if newEmployee.Email == "" || newEmployee.Name == "" || newEmployee.Password == "" || newEmployee.Contact == "" {
+	if newUser.Email == "" || newUser.Password == "" || newUser.UserLink == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Please provide required fields"})
 	}
 
-	if newEmployee.EmployeeType == "" || newEmployee.DOJ == "" || newEmployee.UserLink == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Please provide required fields"})
-	}
-
-	if len(newEmployee.Password) < 6 {
+	if len(newUser.Password) < 6 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Password must contain atleast 6 characters"})
 	}
 
-	passwordHash, hashErr := bcrypt.GenerateFromPassword([]byte(newEmployee.Password), 12)
+	passwordHash, hashErr := bcrypt.GenerateFromPassword([]byte(newUser.Password), 12)
 
 	if hashErr != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Something went wrong"})
 	}
 
-	newEmployee.Password = string(passwordHash)
+	newUser.Password = string(passwordHash)
 
-	newEmployee.ID = primitive.NewObjectID()
+	newUser.ID = primitive.NewObjectID()
 
-	signupErr := db_helpers.InsertEmployee_Samil(newEmployee)
+	newUser.CreatedOn = primitive.NewDateTimeFromTime(time.Now())
+
+	newUser.UpdatedOn = primitive.NewDateTimeFromTime(time.Now())
+
+	signupErr := db_helpers.InsertUser_Samil(newUser)
 
 	if signupErr != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": signupErr.Error()})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Employee Created"})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "User Created"})
 }
 
 func Signin_samil(c *fiber.Ctx) error {
@@ -64,7 +64,7 @@ func Signin_samil(c *fiber.Ctx) error {
 
 	userCreds := new(signinReq)
 
-	employee := new(models.SamilEmployee)
+	user := new(models.SamilUser)
 
 	bodyParseErr := c.BodyParser(&userCreds)
 
@@ -76,27 +76,27 @@ func Signin_samil(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Please fill the required fields"})
 	}
 
-	thisEmployee := db_helpers.GetSamilEmployeeByEmail(userCreds.Email)
+	thisuser := db_helpers.GetSamilUserByEmail(userCreds.Email)
 
-	if thisEmployee.Err() != nil {
+	if thisuser.Err() != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid credentials"})
 	}
 
-	decodeErr := thisEmployee.Decode(&employee)
+	decodeErr := thisuser.Decode(&user)
 
 	if decodeErr != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Something went wrong 2"})
 	}
 
-	passMatchErr := bcrypt.CompareHashAndPassword([]byte(employee.Password), []byte(userCreds.Password))
+	passMatchErr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userCreds.Password))
 
 	if passMatchErr != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Credentials"})
 	}
 
 	tokenClaims := jwt.MapClaims{
-		"email": employee.Email,
-		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+		"id":  user.ID,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenClaims)
@@ -109,7 +109,7 @@ func Signin_samil(c *fiber.Ctx) error {
 
 	cookie := new(fiber.Cookie)
 
-	cookie.Name = "access_id"
+	cookie.Name = "access_id_sml"
 	cookie.Value = tokenString
 	cookie.HTTPOnly = true
 	cookie.Expires = time.Now().Add(24 * time.Hour)

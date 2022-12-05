@@ -12,6 +12,7 @@ import (
 )
 
 func dbInstance() *mongo.Client {
+
 	// envLoadErr := godotenv.Load(".env")
 
 	// if envLoadErr != nil {

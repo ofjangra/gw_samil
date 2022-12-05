@@ -24,13 +24,34 @@ func main() {
 	app.Static("/", "./dist")
 
 	routes.Router_Samil(app)
+	routes.Router_Employees(app)
+	routes.Router_Vehicle(app)
 
-	indexPath, pathErr := filepath.Abs("./dist/index.html")
+	indexPath, indexPathErr := filepath.Abs("./dist/index.html")
+	samilPath, samilPathErr := filepath.Abs("./dist/samil.html")
+	adminPath, adminPathErr := filepath.Abs("./dist/admin.html")
 
-	if pathErr != nil {
-		fmt.Println(pathErr)
+	if samilPathErr != nil {
+		fmt.Println(samilPathErr)
 	}
-	app.Get("*", func(c *fiber.Ctx) error {
+	if indexPathErr != nil {
+		fmt.Println(indexPathErr)
+	}
+	if adminPathErr != nil {
+		fmt.Println(adminPathErr)
+	}
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendFile(indexPath)
+	})
+	app.Get("/samil/*", func(c *fiber.Ctx) error {
+		return c.SendFile(samilPath)
+	})
+
+	app.Get("/admin/*", func(c *fiber.Ctx) error {
+		return c.SendFile(adminPath)
+	})
+
+	app.Get("/*", func(c *fiber.Ctx) error {
 		return c.SendFile(indexPath)
 	})
 
