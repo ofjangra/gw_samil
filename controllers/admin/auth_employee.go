@@ -137,9 +137,9 @@ func Signin_employee(c *fiber.Ctx) error {
 
 func CreateSuperAdmin(c *fiber.Ctx) error {
 
-	updater := new(models.Employee)
-
 	employee := new(models.Employee)
+
+	updater := new(models.Employee)
 
 	updaterId := c.Locals("employee_id").(string)
 

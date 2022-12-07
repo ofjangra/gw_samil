@@ -28,7 +28,7 @@ func GetAdminProfile(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Something went wrong"})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"employee": employee})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"employee": employee, "vas": true})
 
 }
 
@@ -65,10 +65,34 @@ func GetEmployeeProfile(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Something went wrong"})
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"vas": viewer.EmployeeType == "Super Admin", "employee": employee})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"vas":      viewer.EmployeeType == "Super Admin",
+		"employee": employee,
+		"owner":    viewerId == employeeId})
 }
 
 func DeleteEmployee(c *fiber.Ctx) error {
+
+	updater := new(models.Employee)
+
+	updaterId := c.Locals("employee_id").(string)
+
+	thisUpdater, findingErr := db_helpers.GetEmployeeById(updaterId)
+
+	if findingErr != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request Failed"})
+	}
+
+	updaterDecodeErr := thisUpdater.Decode(&updater)
+
+	if updaterDecodeErr != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request Failed"})
+	}
+
+	if updater.EmployeeType != "Super Admin" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Request Denied"})
+	}
+
 	empId := c.Params("id")
 
 	deleteErr := db_helpers.DeleteEmployee(empId)
