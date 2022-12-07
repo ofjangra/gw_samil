@@ -127,6 +127,8 @@ func Signin_employee(c *fiber.Ctx) error {
 	cookie.Name = "aid_gad"
 	cookie.Value = tokenString
 	cookie.HTTPOnly = true
+	cookie.SameSite = "None"
+	cookie.Secure = true
 	cookie.Expires = time.Now().Add(24 * time.Hour)
 
 	c.Cookie(cookie)
