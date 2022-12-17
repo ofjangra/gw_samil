@@ -119,14 +119,14 @@ func UpdateEmployeeProfile(id string, update bson.M) error {
 	employeeId, idErr := primitive.ObjectIDFromHex(id)
 
 	if idErr != nil {
-		return errors.New("failed to update profile 1")
+		return errors.New("failed to update profile")
 	}
 
 	_, updateErr := db.EmployeesCollection.UpdateByID(ctx, employeeId, bson.M{"$set": update})
 
 	if updateErr != nil {
 		fmt.Println(updateErr)
-		return errors.New("failed to update profile 2")
+		return errors.New("failed to update profile")
 	}
 	return nil
 

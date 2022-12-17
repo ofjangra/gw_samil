@@ -10,6 +10,8 @@ var VehiclesCollection *mongo.Collection
 
 var FleetUsersCollection *mongo.Collection
 
+var SP_AutomobileDealerCollection *mongo.Collection
+
 func init() {
 
 	client := dbInstance()
@@ -21,5 +23,7 @@ func init() {
 	FleetUsersCollection = client.Database("users").Collection("fleet_users")
 
 	VehiclesCollection = client.Database("vehicles").Collection("fleet_vehicles")
+
+	SP_AutomobileDealerCollection = client.Database("main").Collection("services_pricing")
 
 }

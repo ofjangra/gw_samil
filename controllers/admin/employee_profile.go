@@ -116,6 +116,9 @@ func GetAllEmployees(c *fiber.Ctx) error {
 }
 
 func UpdateEmployeeProfile(c *fiber.Ctx) error {
+
+	employeeId := c.Params("id")
+
 	updateBody := bson.M{}
 
 	bodyParseErr := c.BodyParser(&updateBody)
@@ -141,8 +144,6 @@ func UpdateEmployeeProfile(c *fiber.Ctx) error {
 
 		updateBody["updated_on"] = primitive.NewDateTimeFromTime(time.Now())
 
-		employeeId := c.Params("id")
-
 		profileUpdateErr := db_helpers.UpdateEmployeeProfile(employeeId, updateBody)
 
 		if profileUpdateErr != nil {
@@ -158,8 +159,6 @@ func UpdateEmployeeProfile(c *fiber.Ctx) error {
 	updateBody["updated_by"] = updaterId
 
 	updateBody["updated_on"] = primitive.NewDateTimeFromTime(time.Now())
-
-	employeeId := c.Params("id")
 
 	profileUpdateErr := db_helpers.UpdateEmployeeProfile(employeeId, updateBody)
 
