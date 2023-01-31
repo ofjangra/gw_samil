@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/ofjangra/gwonline/db_helpers"
+	db_helpers "github.com/ofjangra/gwonline/db_helpers/employees"
 	"github.com/ofjangra/gwonline/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -152,6 +152,27 @@ func UpdateEmployeeProfile(c *fiber.Ctx) error {
 
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Password updated successfully"})
 
+	}
+
+	imageUrl, imageOk := updateBody["profile_photo"]
+
+	if imageOk {
+
+		updateBody["profile_photo"] = imageUrl
+
+		updaterId := c.Locals("employee_id").(string)
+
+		updateBody["updated_by"] = updaterId
+
+		updateBody["updated_on"] = primitive.NewDateTimeFromTime(time.Now())
+
+		profileUpdateErr := db_helpers.UpdateEmployeeProfile(employeeId, updateBody)
+
+		if profileUpdateErr != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": profileUpdateErr.Error()})
+		}
+
+		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Profile Photo updated successfully"})
 	}
 
 	updaterId := c.Locals("employee_id").(string)

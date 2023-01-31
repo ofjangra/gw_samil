@@ -1,0 +1,271 @@
+.upperNav {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 55px;
+    width: 100%;
+    background-color: var(--main-bg);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start
+}
+
+#navToggle {
+    cursor: pointer
+}
+
+#logout {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: none;
+    height: 30px;
+    width: 80px;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: Manrope;
+    font-weight: 700
+}
+
+#logout:hover {
+    background-color: var(--text-secondary);
+    color: var(--main-bg)
+}
+
+.sideNav {
+    position: absolute;
+    height: 100vh;
+    background-color: var(--main-bg);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 60px 0 60px 20px;
+    color: var(--text-primary);
+    font-family: Manrope
+}
+
+.sideNav ul {
+    list-style: none;
+    height: auto;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center
+}
+
+.sideNav li {
+    margin: 10px 0;
+    width: 100%;
+    line-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px
+}
+
+iframe {
+    margin-top: -108px;
+    margin-left: -50px;
+    bottom: 0;
+    height: 130vh;
+    min-height: 620px;
+    width: 110%
+}
+
+#errorAfter,
+#errorAfter:active {
+    color: #03ade0;
+    font-family: Manrope;
+    cursor: pointer;
+    text-decoration: none
+}
+
+.blogFrame {
+    position: absolute;
+    top: 155px;
+    right: 0;
+    left: 50px;
+    z-index: -1;
+    padding-top: -50px
+}
+
+.blogFrame iframe {
+    margin-top: -280px;
+    border: none
+}
+
+.navlink {
+    text-decoration: none;
+    color: var(--text-primary);
+    width: 100%;
+    line-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px
+}
+
+.navlink:active {
+    text-decoration: none;
+    color: var(--text-primary)
+}
+
+.navlink:hover {
+    background-color: var(--text-secondary);
+    color: var(--main-bg);
+    padding-left: 8px
+}
+
+:root {
+    --main-bg: #e9e9e9;
+    --text-primary: #000000;
+    --text-secondary: #222222
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box
+}
+
+body {
+    overflow: hidden
+}
+
+@font-face {
+    font-family: Manrope;
+    src: url(/assets/Manrope-VariableFont_wght.fd037d92.ttf)
+}
+
+.SignupMain {
+    height: 100vh;
+    min-height: 520px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Manrope;
+    background-color: var(--main-bg)
+}
+
+.authIntro {
+    position: absolute;
+    top: 24px;
+    left: 0;
+    height: auto;
+    width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.authIntro * {
+    margin-left: 24px
+}
+
+.authIntro h2 {
+    font-family: Manrope;
+    font-size: 40px;
+    border-left: 1px solid var(--text-secondary);
+    padding-left: 20px
+}
+
+.authIntro img {
+    height: 60px
+}
+
+.authForm {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: var(--text-primary)
+}
+
+.authForm .field {
+    height: auto;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 12px 0
+}
+
+.authForm label {
+    font-weight: 700;
+    opacity: 80%
+}
+
+.authForm input {
+    height: auto;
+    width: 380px;
+    padding: 10px 8px;
+    font-size: 16px;
+    border: 1px solid var(--text-primary);
+    border-radius: 4px;
+    background: none
+}
+
+.authForm input:focus {
+    outline: 1px solid var(--text-primary)
+}
+
+.authForm button {
+    height: auto;
+    padding: 8px 0;
+    margin: 20px 0;
+    border: none;
+    border-radius: 4px;
+    width: 180px;
+    background-color: var(--text-secondary);
+    color: var(--main-bg);
+    font-size: 16px;
+    font-family: Manrope;
+    cursor: pointer
+}
+
+.intLink {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center
+}
+
+.intLink *:last-child {
+    margin-left: 8px;
+    font-size: 14px
+}
+
+.intLink:active {
+    color: var(--text-secondary);
+    text-decoration: none
+}
+
+@media screen and (max-width:460px) {
+    .authForm {
+        padding: 20px
+    }
+
+    .authForm .field,
+    .authForm .field input {
+        width: 100%
+    }
+
+    ;
+
+    
+}

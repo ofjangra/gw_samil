@@ -10,10 +10,16 @@ func Router_ServicePricing(app *fiber.App) {
 
 	router := app
 
-	router.Post("/api/sp/automobile_dealer", middleware.AdminAuth(), pricing_controllers.CreateEntry_SP_AutomobileDealer)
+	router.Post("/api/sp/create_entry", middleware.AdminAuth(), pricing_controllers.CreatePricingEntry)
 
-	router.Get("/api/sp/automobile_dealer", pricing_controllers.GetEntry_SP_AutomobileDealer)
+	router.Get("/api/sp/passing", pricing_controllers.GetPricingEntry_passing)
 
-	router.Put("/api/sp/automobile_dealer/:id", middleware.AdminAuth(), pricing_controllers.UpdateEntry_SP_AutomobileDealer)
+	router.Get("/api/sp/seating", pricing_controllers.GetPricingEntry_seating)
+
+	router.Post("/api/sp/partner", middleware.AdminAuth(), pricing_controllers.CreateEntry_SP_Partner)
+
+	router.Get("/api/sp/partner", pricing_controllers.GetEntry_SP_Partner)
+
+	// router.Put("/api/sp/automobile_dealer/:id", middleware.AdminAuth(), pricing_controllers.UpdateEntry_SP_Loading)
 
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
-	"github.com/ofjangra/gwonline/db_helpers"
+	db_helpers "github.com/ofjangra/gwonline/db_helpers/users"
 	"github.com/ofjangra/gwonline/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -23,6 +23,10 @@ func Signup_samil(c *fiber.Ctx) error {
 	}
 
 	if newUser.Email == "" || newUser.Password == "" || newUser.UserLink == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Please provide required fields"})
+	}
+
+	if newUser.ChallanDash && newUser.ChallanDashURL == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Please provide required fields"})
 	}
 

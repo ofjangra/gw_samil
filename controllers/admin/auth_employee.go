@@ -8,7 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
-	"github.com/ofjangra/gwonline/db_helpers"
+	db_helpers "github.com/ofjangra/gwonline/db_helpers/employees"
 	"github.com/ofjangra/gwonline/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -31,7 +31,7 @@ func Signup_employee(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Please provide required fields"})
 	}
 
-	if newEmployee.EmployeeType == "" || newEmployee.DOJ == "" {
+	if newEmployee.EmployeeType == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Please provide required fields"})
 	}
 

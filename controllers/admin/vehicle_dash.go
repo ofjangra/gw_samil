@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/ofjangra/gwonline/db_helpers"
+	db_helpers "github.com/ofjangra/gwonline/db_helpers/vehicles"
 	"github.com/ofjangra/gwonline/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

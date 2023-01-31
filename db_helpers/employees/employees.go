@@ -122,6 +122,30 @@ func UpdateEmployeeProfile(id string, update bson.M) error {
 		return errors.New("failed to update profile")
 	}
 
+	emailValue, emailOk := update["email"]
+
+	if emailOk {
+		docCountWithThisEmail, emailDocCountErr := db.EmployeesCollection.CountDocuments(ctx, bson.M{"email": emailValue})
+
+		if emailDocCountErr != nil {
+			return errors.New("failed to update profile")
+		} else if docCountWithThisEmail > 0 {
+			return errors.New("email already exists")
+		}
+	}
+
+	contactValue, contactOk := update["contact"]
+
+	if contactOk {
+		docCountWithThiscontact, contactDocCountErr := db.EmployeesCollection.CountDocuments(ctx, bson.M{"contact": contactValue})
+
+		if contactDocCountErr != nil {
+			return errors.New("failed to update profile")
+		} else if docCountWithThiscontact > 0 {
+			return errors.New("contact already exists")
+		}
+	}
+
 	_, updateErr := db.EmployeesCollection.UpdateByID(ctx, employeeId, bson.M{"$set": update})
 
 	if updateErr != nil {

@@ -2,7 +2,7 @@ package samil_controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/ofjangra/gwonline/db_helpers"
+	db_helpers "github.com/ofjangra/gwonline/db_helpers/users"
 	"github.com/ofjangra/gwonline/models"
 )
 

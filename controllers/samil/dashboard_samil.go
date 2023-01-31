@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/ofjangra/gwonline/db_helpers"
+	db_helpers "github.com/ofjangra/gwonline/db_helpers/users"
 	"github.com/ofjangra/gwonline/models"
 )
 
@@ -20,5 +20,5 @@ func Home_Samil(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Something went wrong"})
 	}
 
-	return c.Status(200).JSON(fiber.Map{"userlink": user.UserLink})
+	return c.Status(200).JSON(fiber.Map{"userlink": user.UserLink, "challan_dash": user.ChallanDash, "challan_dash_url": user.ChallanDashURL})
 }

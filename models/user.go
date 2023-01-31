@@ -25,14 +25,16 @@ type FleetUser struct {
 }
 
 type SamilUser struct {
-	ID        primitive.ObjectID `json:"_id" bson:"_id"`
-	Email     string             `json:"email"`
-	Location  string             `json:"location"`
-	UserLink  string             `json:"userlink"`
-	Password  string             `json:"password"`
-	Active    bool               `json:"active"`
-	CreatedOn primitive.DateTime `json:"created_on" bson:"created_on"`
-	UpdatedOn primitive.DateTime `json:"updated_on" bson:"updated_on"`
-	CreatedBy string             `json:"created_by" bson:"created_by"`
-	UpdatedBy string             `json:"updated_by" bson:"updated_by"`
+	ID             primitive.ObjectID `json:"_id" bson:"_id"`
+	Email          string             `json:"email"`
+	Location       string             `json:"location"`
+	ChallanDash    bool               `json:"challan_dash" bson:"challan_dash"`
+	ChallanDashURL string             `json:"challan_dsh_url" bson:"challan_dsh_url"`
+	UserLink       string             `json:"userlink"`
+	Password       string             `json:"password"`
+	Active         bool               `json:"active"`
+	CreatedOn      primitive.DateTime `json:"created_on" bson:"created_on"`
+	UpdatedOn      primitive.DateTime `json:"updated_on" bson:"updated_on"`
+	CreatedBy      string             `json:"created_by" bson:"created_by"`
+	UpdatedBy      string             `json:"updated_by" bson:"updated_by"`
 }
